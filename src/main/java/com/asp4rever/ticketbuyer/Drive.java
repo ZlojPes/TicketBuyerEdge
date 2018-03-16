@@ -44,7 +44,7 @@ public class Drive implements Runnable {
         }
         boolean run = true;
         prepareStations();
-        driver.findElement(By.id("date_dep")).click();
+        driver.findElement(By.name("date-hover")).click();
         chooseDate();
         while (run) {
             List<WebElement> trainList = getTrainList();
@@ -95,12 +95,26 @@ public class Drive implements Runnable {
     }
 
     private void prepareStations() {
-        driver.findElement(By.name("station_from")).clear();
-        driver.findElement(By.name("station_from")).sendKeys(frame.getFromStation());
-        driver.findElement(By.className("ui-menu-item ui-state-focus")).click();
-        driver.findElement(By.name("station_till")).clear();
-        driver.findElement(By.name("station_till")).sendKeys(frame.getTillStation());
-        driver.findElement(By.className("ui-menu-item ui-state-focus")).click();
+        WebElement fromTitle = driver.findElement(By.name("from-title"));
+        WebElement toTitle = driver.findElement(By.name("to-title"));
+        fromTitle.clear();
+        fromTitle.sendKeys(frame.getFromStation());
+        fromTitle.sendKeys(Keys.ARROW_RIGHT);
+        driver.findElement(By.className("ui-menu-item"));
+        fromTitle.sendKeys(Keys.ARROW_DOWN);
+        fromTitle.sendKeys(Keys.ENTER);
+        toTitle.clear();
+        toTitle.sendKeys(frame.getToStation());
+        toTitle.sendKeys(Keys.ARROW_RIGHT);
+        driver.findElement(By.className("ui-menu-item"));
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        toTitle.sendKeys(Keys.ARROW_DOWN);
+        driver.findElement(By.className("ui-menu-item ui-state-focus"));
+        toTitle.sendKeys(Keys.ENTER, Keys.TAB);
     }
 
     private boolean exploreTrainPopUp() {
@@ -166,7 +180,15 @@ public class Drive implements Runnable {
     }
 
     private void chooseDate() {
+        System.out.println("chooseDate() started");
         int[] date = frame.getDate();
+        List<WebElement> monthList = driver.findElements(By.className("ui-calendar-month"));
+        for (WebElement month : monthList) {
+            if (month.getText().equals("Апрель")) {
+                month.click();
+                return;
+            }
+        }
         List<WebElement> daysList = driver.findElements(By.cssSelector("td[data-month='" + (date[1] - 1) + "']"));
         for (WebElement day : daysList) {
             if (day.getText().equals("" + date[0])) {

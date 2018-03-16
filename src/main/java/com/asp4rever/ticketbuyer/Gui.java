@@ -869,7 +869,7 @@ public class Gui extends javax.swing.JFrame {
         return fromField.getText();
     }
 
-    String getTillStation() {
+    String getToStation() {
         return tillField.getText();
     }
 
